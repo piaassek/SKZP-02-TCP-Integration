@@ -19,7 +19,7 @@ Komunikacja odbywa się w czasie rzeczywistym w sieci lokalnej przez strumień T
 * 🔄 **Wybór trybu pracy (Select)** — rozwijana lista umożliwiająca zmianę trybu podgrzewacza wody (CWU): *Stop*, *Auto*, *Lato*, *Cyrkulacja*.
 * 🛡️ **Zgodność z najnowszymi standardami HA** — polskie nazwy na kartach i wykresach przy jednoczesnym automatycznym generowaniu czystych identyfikatorów systemowych bez polskich znaków (np. `sensor.skzp_temperatura_kotla`). Pełna zachowalność historii wykresów!
 * ⚙️ **Prosta konfiguracja w UI** — instalacja i zmiana parametrów (IP/Port) bezpośrednio w interfejsie graficznym Home Assistanta.
-
+<img width="520" height="1024" alt="671957794_26340330608980783_6767839624693781370_n" src="https://github.com/user-attachments/assets/9dad167d-47a0-4bd5-be86-8865803f8716" />
 ---
 
 ## 📥 Instalacja przez HACS (Zalecana)
@@ -62,4 +62,4 @@ W folderze integracji (`/config/custom_components/skzp/`) znajduje się plik **`
     # "ExhaustTempMax": {"name": "Maks. temperatura spalin", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-alert"},
 
 
-<img width="2569" height="1054" alt="Zrzut ekranu 2026-07-26 183417" src="https://github.com/user-attachments/assets/56d34fac-511b-4c90-8396-0c44f5d3a28b" />
+
