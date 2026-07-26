@@ -60,3 +60,6 @@ W folderze integracji (`/config/custom_components/skzp/`) znajduje się plik **`
 
     # Przykład nieaktywnego sensora (ukryty w HA):
     # "ExhaustTempMax": {"name": "Maks. temperatura spalin", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-alert"},
+
+
+<img width="2569" height="1054" alt="Zrzut ekranu 2026-07-26 183417" src="https://github.com/user-attachments/assets/56d34fac-511b-4c90-8396-0c44f5d3a28b" />
