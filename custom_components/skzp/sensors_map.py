@@ -1,20 +1,17 @@
-
 # 📌 Mapa znanych kluczy → ładne nazwy, jednostki i dzielniki
 
 SENSOR_MAP = {
     # ✅ Podstawowe dane systemowe
-
-    # 🏭 Dane urządzenia / identyfikacja (opcjonalne)
     # "DevId": {"name": "ID urządzenia"},
-    # "DevPin": {"name": "PIN urządzenia
+    # "DevPin": {"name": "PIN urządzenia"},
     "DevType": {"name": "Typ sterownika", "icon": "mdi:chip"},
     # "Token": {"name": "Token sesji"},
-    "TimeStamp": {"name": "Czas sterownika"},
+    "TimeStamp": {"name": "Czas sterownika", "icon": "mdi:clock-outline"},
     # "FrameType": {"name": "Typ ramki"},
-    # "DevType": {"name": "Typ sterownika"},
     "DevStatus": {"name": "Surowy status sterownika"},
-    "Alarms": {"name": "Alarmy"},
-    "UpTime": {"name": "Czas działania"},
+    "Alarms": {"name": "Alarmy", "icon": "mdi:alert"},
+    "UpTime": {"name": "Czas działania", "icon": "mdi:timer"},
+    "AN01": {"name": "Sygnał analogowy AN01", "unit": "V", "divider": 100, "icon": "mdi:sine-wave"},
 
     # 🌡️ Temperatura kotła i spalin
     "BoilerTempAct": {"name": "Temperatura kotła", "unit": "°C", "divider": 100, "icon": "mdi:fire", "state_class": "measurement", "device_class": "temperature"},
@@ -35,7 +32,7 @@ SENSOR_MAP = {
     # "DHWCWork": {"name": "Czas pracy cyrkulacji CWU", "unit": "s", "divider": 1, "icon": "mdi:timer"},
     # "DHWCBrake": {"name": "Czas przerwy cyrkulacji CWU", "unit": "s", "divider": 1, "icon": "mdi:timer-off"},
 
-    # 🌡️ CO1 i mieszacz
+    # --- 🌡️ SKZP-02: CO1 i mieszacz (STARY STEROWNIK) ---
     "CH1ReturnTempAct": {"name": "Temperatura powrotu CO1", "unit": "°C", "divider": 100, "icon": "mdi:radiator", "state_class": "measurement", "device_class": "temperature"},
     "CH1ReturnTempCmd": {"name": "Zadana temperatura powrotu CO1", "unit": "°C", "divider": 100, "icon": "mdi:radiator"},
     # "CH1ReturnProtAct": {"name": "Ochrona powrotu CO1", "unit": "", "divider": 1, "icon": "mdi:shield-check"},
@@ -113,11 +110,49 @@ SENSOR_MAP = {
     # "K005": {"name": "Parametr K005", "unit": "", "divider": 1, "icon": "mdi:tools"},
     # "K006": {"name": "Parametr K006", "unit": "", "divider": 1, "icon": "mdi:tools"},
     # "K007": {"name": "Parametr K007", "unit": "", "divider": 1, "icon": "mdi:tools"},
+
+
+    # =========================================================
+    # --- 📊 SKZP-05: NOWA GENERACJA STEROWNIKA ---
+    # =========================================================
+
+    "C030": {"name": "O1 Zadana temperatura powrotu", "unit": "°C", "divider": 100, "icon": "mdi:radiator"},
+    
+    # 📊 OBIEG 1 (C0) - np. Grzejniki
+    "C006": {"name": "O1 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
+    "C008": {"name": "O1 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
+    "C013": {"name": "O1 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
+    "C014": {"name": "O1 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
+    "C015": {"name": "O1 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
+    "C027": {"name": "O1 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
+    "C040": {"name": "O1 Baza krzywej grzewczej", "unit": "°C", "divider": 100, "icon": "mdi:chart-bell-curve"},
+
+    # 📊 OBIEG 2 (C1)
+    "C106": {"name": "O2 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
+    "C108": {"name": "O2 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
+    "C113": {"name": "O2 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
+    "C114": {"name": "O2 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
+    "C115": {"name": "O2 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
+    "C127": {"name": "O2 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
+
+    # 📊 OBIEG 3 (C2)
+    "C206": {"name": "O3 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
+    "C208": {"name": "O3 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
+    "C213": {"name": "O3 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
+    "C214": {"name": "O3 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
+    "C215": {"name": "O3 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
+    "C227": {"name": "O3 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
+
+    # 🛢️ Zewnętrzne źródła ciepła / BUFOR (D2)
+    "D203": {"name": "Temperatura bufora góra", "unit": "°C", "divider": 100, "icon": "mdi:water-boiler", "state_class": "measurement", "device_class": "temperature"},
+    "D204": {"name": "Temperatura bufora dół", "unit": "°C", "divider": 100, "icon": "mdi:water-boiler", "state_class": "measurement", "device_class": "temperature"},
+    "D201": {"name": "Czujnik zewnętrzny D201", "unit": "°C", "divider": 100, "icon": "mdi:thermometer"},
+    "D202": {"name": "Czujnik zewnętrzny D202", "unit": "°C", "divider": 100, "icon": "mdi:thermometer"},
 }
 
-
+# --- Statusy dekodowane przez value_decoder ---
 SENSOR_MAP.update({
-    "DevStatus_Mode": {"name": "Tryb pracy kotła"},
+    "DevStatus_Mode": {"name": "Tryb pracy kotła", "icon": "mdi:state-machine"},
     "DevStatus_Power": {"name": "Moc kotła", "unit": "%", "icon": "mdi:fire", "state_class": "measurement"},
     "DevStatus_Fan": {"name": "Moc dmuchawy", "unit": "%", "icon": "mdi:fan", "state_class": "measurement"},
 })
