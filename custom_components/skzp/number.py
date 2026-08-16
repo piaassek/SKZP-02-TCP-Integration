@@ -5,12 +5,23 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+# --- UNIWERSALNA MAPA SUWAKÓW (SKZP-02 + SKZP-05) ---
 NUMBERS = {
+    # ⚙️ WSPÓLNE / SKZP-02
     "BuModulMin": {"name": "Min. modulacja", "min": 1, "max": 100, "step": 1, "icon": "mdi:gauge"},
     "BoilerTempCmd": {"name": "Zad. T. Kotła", "min": 40, "max": 80, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
     "DHWTempCmd": {"name": "Zad. T. CWU", "min": 30, "max": 65, "step": 1, "icon": "mdi:water-boiler", "divider": 100},
-    "CH1RoomTempCom": {"name": "Temp.Komfort", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "CH1RoomTempEco": {"name": "Temp. w domu (Eco)", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100}
+    "CH1RoomTempCom": {"name": "Temp.Komfort (Stary)", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "CH1RoomTempEco": {"name": "Temp. w domu (Eco)", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+
+    # 📊 NOWE SKZP-05 (Trzy obiegi grzewcze)
+    "C030": {"name": "O1 Zad. T. Powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
+    "C013": {"name": "O1 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "C014": {"name": "O1 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "C113": {"name": "O2 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "C114": {"name": "O2 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "C213": {"name": "O3 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "C214": {"name": "O3 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -103,6 +114,6 @@ class SkzpNumber(RestoreNumber):
     def device_info(self):
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP-02",
+            "name": "SKZP",  # ZMIENIONO NA UNIWERSALNE "SKZP"
             "manufacturer": "Timel",
         }
