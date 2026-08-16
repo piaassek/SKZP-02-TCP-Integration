@@ -5,7 +5,6 @@ from homeassistant.core import callback
 
 from .const import DOMAIN
 
-
 _LOGGER = logging.getLogger(__name__)
 
 # 🔸 Mapa binarnych sygnałów z DevStatus
@@ -15,9 +14,10 @@ PUMP_KEYS = {
     "DevStatus_CO1": ("Pompa CO1", 10),
     "DevStatus_CO2": ("Pompa CO2", 11),
     "DevStatus_CWU": ("Pompa CWU", 12),
-    "DevStatus_CWR": ("Pompa CWR", 13),
+    "DevStatus_CWR": ("Pompa Cyrkulacyjna", 13),
+    # ⬇️ Dodatkowe pompy dostępne w nowym SKZP-05 (np. rozbudowane obiegi i bufor)
     "DevStatus_CO3": ("Pompa CO3", 14),
-    "DevStatus_COB": ("Pompa COB", 15),
+    "DevStatus_COB": ("Pompa Bufora", 15),
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -40,21 +40,29 @@ class DevStatusBinarySensor(BinarySensorEntity):
         self._key = key
         self._index = index
         self._attr_name = name
+        
+        # Bezpieczne ID systemowe (brak polskich znaków z uwagi na angielskie klucze)
         self.entity_id = f"binary_sensor.skzp_{key.lower()}"
-        self._attr_unique_id = self.entity_id  # 👈 DODAJ TO
+        self._attr_unique_id = self.entity_id  
+        
+        # Dynamiczne dobieranie ikon
+        self._attr_icon = "mdi:pump" if "CO" in key or "CW" in key else "mdi:screw-forward"
+        
         self._remove_listener = self._client.hass.bus.async_listen(
             f"{DOMAIN}_data_update", self._handle_data_update
         )
         self._attr_is_on = False
 
-
     @callback
     def _handle_data_update(self, event):
         devstatus = self._client.data.get("DevStatus", "")
+        
+        # Zabezpieczenie przed krótszym stringiem w starszych modelach (np. SKZP-02)
         if len(devstatus) > self._index:
             self._attr_is_on = devstatus[self._index] == "1"
         else:
             self._attr_is_on = False
+            
         self.async_write_ha_state()
 
     async def async_will_remove_from_hass(self):
@@ -63,10 +71,9 @@ class DevStatusBinarySensor(BinarySensorEntity):
 
     @property
     def device_info(self):
-        """Powiązanie sensora z urządzeniem SKZP."""
+        """Powiązanie sensora z uniwersalnym urządzeniem SKZP."""
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP-02T",
-            "manufacturer": "SKZP",
-            "model": "SKZP TCP Integration",
+            "name": "SKZP",
+            "manufacturer": "Timel",
         }
