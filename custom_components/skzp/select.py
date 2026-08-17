@@ -31,7 +31,7 @@ class SkzpDHWModeSelect(SelectEntity):
     def __init__(self, client):
         self._client = client
         self.entity_id = "select.skzp_dhwmode"
-        self._attr_unique_id = self.entity_id
+        self._attr_unique_id = "skzp_dhwmode"
         self._attr_options = list(DHW_MODES.keys())
         self._attr_current_option = None
         self._remove_listener = None
@@ -73,6 +73,7 @@ class SkzpDHWModeSelect(SelectEntity):
     def device_info(self):
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP-02",
+            "name": "SKZP",
             "manufacturer": "Timel",
-        }
+            "model": "SKZP TCP Integration",
+        }

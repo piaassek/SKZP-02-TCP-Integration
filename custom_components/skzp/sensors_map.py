@@ -119,35 +119,35 @@ SENSOR_MAP = {
     "C030": {"name": "O1 Zadana temperatura powrotu", "unit": "°C", "divider": 100, "icon": "mdi:radiator"},
     
     # 📊 OBIEG 1 (C0) - np. Grzejniki
-    "C006": {"name": "O1 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
-    "C008": {"name": "O1 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
-    "C013": {"name": "O1 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
-    "C014": {"name": "O1 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
-    "C015": {"name": "O1 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
-    "C027": {"name": "O1 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
-    "C040": {"name": "O1 Baza krzywej grzewczej", "unit": "°C", "divider": 100, "icon": "mdi:chart-bell-curve"},
+    #"C006": {"name": "O1 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
+    #"C008": {"name": "O1 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
+    #"C013": {"name": "O1 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
+    #"C014": {"name": "O1 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
+    #"C015": {"name": "O1 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
+    #"C027": {"name": "O1 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
+    #"C040": {"name": "O1 Baza krzywej grzewczej", "unit": "°C", "divider": 100, "icon": "mdi:chart-bell-curve"},
 
     # 📊 OBIEG 2 (C1)
-    "C106": {"name": "O2 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
-    "C108": {"name": "O2 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
-    "C113": {"name": "O2 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
-    "C114": {"name": "O2 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
-    "C115": {"name": "O2 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
-    "C127": {"name": "O2 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
+    #"C106": {"name": "O2 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
+    #"C108": {"name": "O2 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
+    #"C113": {"name": "O2 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
+    #"C114": {"name": "O2 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
+    #"C115": {"name": "O2 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
+    #"C127": {"name": "O2 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
 
     # 📊 OBIEG 3 (C2)
-    "C206": {"name": "O3 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
-    "C208": {"name": "O3 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
-    "C213": {"name": "O3 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
-    "C214": {"name": "O3 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
-    "C215": {"name": "O3 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
-    "C227": {"name": "O3 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
+    #"C206": {"name": "O3 Temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:valve", "state_class": "measurement", "device_class": "temperature"},
+    #"C208": {"name": "O3 Temp. pomieszczenia", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer", "state_class": "measurement", "device_class": "temperature"},
+    #"C213": {"name": "O3 Temp. komfortowa", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer"},
+    #"C214": {"name": "O3 Temp. ECO", "unit": "°C", "divider": 100, "icon": "mdi:home-thermometer-outline"},
+    #"C215": {"name": "O3 Histereza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-lines"},
+    #"C227": {"name": "O3 Max temp. mieszacza", "unit": "°C", "divider": 100, "icon": "mdi:thermometer-chevron-up"},
 
     # 🛢️ Zewnętrzne źródła ciepła / BUFOR (D2)
-    "D203": {"name": "Temperatura bufora góra", "unit": "°C", "divider": 100, "icon": "mdi:water-boiler", "state_class": "measurement", "device_class": "temperature"},
-    "D204": {"name": "Temperatura bufora dół", "unit": "°C", "divider": 100, "icon": "mdi:water-boiler", "state_class": "measurement", "device_class": "temperature"},
-    "D201": {"name": "Czujnik zewnętrzny D201", "unit": "°C", "divider": 100, "icon": "mdi:thermometer"},
-    "D202": {"name": "Czujnik zewnętrzny D202", "unit": "°C", "divider": 100, "icon": "mdi:thermometer"},
+    #"D203": {"name": "Temperatura bufora góra", "unit": "°C", "divider": 100, "icon": "mdi:water-boiler", "state_class": "measurement", "device_class": "temperature"},
+    #"D204": {"name": "Temperatura bufora dół", "unit": "°C", "divider": 100, "icon": "mdi:water-boiler", "state_class": "measurement", "device_class": "temperature"},
+    #"D201": {"name": "Czujnik zewnętrzny D201", "unit": "°C", "divider": 100, "icon": "mdi:thermometer"},
+    #"D202": {"name": "Czujnik zewnętrzny D202", "unit": "°C", "divider": 100, "icon": "mdi:thermometer"},
 }
 
 # --- Statusy dekodowane przez value_decoder ---

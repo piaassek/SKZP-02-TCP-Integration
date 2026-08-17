@@ -20,10 +20,11 @@ def decode_value(key: str, raw_value: str) -> str:
     return str(raw_value) if raw_value is not None else STATE_UNKNOWN
 
 
-def _decode_devstatus_mode(raw_value: str) -> str:
-    if not raw_value or len(raw_value) < 3:
+def _decode_devstatus_mode(raw_value) -> str:
+    raw_str = str(raw_value) if raw_value is not None else ""
+    if not raw_str or len(raw_str) < 3:
         return STATE_UNKNOWN
-    mode = raw_value[0:3]
+    mode = raw_str[0:3]
     mode_map = {
         "PRA": "Praca",
         "CZU": "Czuwanie",
@@ -41,26 +42,29 @@ def _decode_devstatus_mode(raw_value: str) -> str:
     return mode_map.get(mode, f"Nieznany ({mode})")
 
 
-def _decode_devstatus_power(raw_value: str) -> int:
-    if not raw_value or len(raw_value) < 6:
+def _decode_devstatus_power(raw_value) -> int:
+    raw_str = str(raw_value) if raw_value is not None else ""
+    if not raw_str or len(raw_str) < 6:
         return 0
     try:
-        return int(raw_value[3:6])
+        return int(raw_str[3:6])
     except Exception:
         return 0
 
 
-def _decode_devstatus_fan(raw_value: str) -> int:
-    if not raw_value or len(raw_value) < 9:
+def _decode_devstatus_fan(raw_value) -> int:
+    raw_str = str(raw_value) if raw_value is not None else ""
+    if not raw_str or len(raw_str) < 9:
         return 0
     try:
-        return int(raw_value[6:9])
+        return int(raw_str[6:9])
     except Exception:
         return 0
 
 
-def _decode_alarms(raw_value: str) -> str:
+def _decode_alarms(raw_value) -> str:
     try:
+        raw_str = str(raw_value) if raw_value is not None else ""
         alarm_map = {
             "A": "Przegrzanie kotła",
             "B": "Przegrzanie palnika",
@@ -78,16 +82,17 @@ def _decode_alarms(raw_value: str) -> str:
             "W": "Błąd konf. modułu",
         }
 
-        if not raw_value or raw_value.strip("0") == "":
+        if not raw_str or raw_str.strip("0") == "":
             return "Brak alarmu"
 
-        active = [desc for code, desc in alarm_map.items() if code in raw_value]
+        active = [desc for code, desc in alarm_map.items() if code in raw_str]
 
         if not active:
-            return f"Nieznany alarm ({raw_value})"
+            return f"Nieznany alarm ({raw_str})"
 
         return ", ".join(active)
 
     except Exception as e:
         _LOGGER.warning(f"[SKZP] Błąd dekodowania Alarms: {e}")
-        return str(raw_value) if raw_value else STATE_UNKNOWN
+        return str(raw_value) if raw_value is not None else STATE_UNKNOWN
+

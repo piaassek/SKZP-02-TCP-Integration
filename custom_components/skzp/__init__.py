@@ -6,11 +6,10 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.config_entries import SOURCE_IMPORT
 
-from .const import DOMAIN, DEFAULT_HOST, DEFAULT_PORT
+from .const import DOMAIN, DEFAULT_HOST, DEFAULT_PORT, CONF_PIN, DEFAULT_PIN
 
 _LOGGER = logging.getLogger(__name__)
 
-# --- NASZA NOWA ZMIENNA Z PLATFORMAMI ---
 PLATFORMS = ["sensor", "binary_sensor", "number", "select"]
 
 
@@ -21,6 +20,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
     if DOMAIN in config:
         host = config[DOMAIN].get("host", DEFAULT_HOST)
         port = config[DOMAIN].get("port", DEFAULT_PORT)
+        pin = config[DOMAIN].get(CONF_PIN, DEFAULT_PIN)
 
         existing_entries = hass.config_entries.async_entries(DOMAIN)
         if not existing_entries:
@@ -28,7 +28,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
                 hass.config_entries.flow.async_init(
                     DOMAIN,
                     context={"source": SOURCE_IMPORT},
-                    data={"host": host, "port": port},
+                    data={"host": host, "port": port, CONF_PIN: pin},
                 )
             )
     return True
@@ -38,12 +38,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Konfiguracja po utworzeniu wpisu konfiguracyjnego."""
     host = entry.data.get("host", DEFAULT_HOST)
     port = entry.data.get("port", DEFAULT_PORT)
+    pin = entry.data.get(CONF_PIN, DEFAULT_PIN)
 
-    skzp_client = SkzpTcpClient(hass, host, port)
+    skzp_client = SkzpTcpClient(hass, host, port, pin)
     hass.data[DOMAIN]["client"] = skzp_client
     await skzp_client.start()
 
-    # ZMIANA: używamy naszej stałej listy PLATFORMS
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
@@ -54,17 +54,17 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     if client:
         await client.stop()
         
-    # ZMIANA: używamy naszej stałej listy PLATFORMS
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
 class SkzpTcpClient:
     """Prosty klient TCP odbierający linie JSON (ASCII) i publikujący eventy w HA."""
 
-    def __init__(self, hass: HomeAssistant, host: str, port: int):
+    def __init__(self, hass: HomeAssistant, host: str, port: int, pin: str = DEFAULT_PIN):
         self.hass = hass
         self.host = host
         self.port = port
+        self.pin = str(pin)
         self._reader = None
         self._writer = None
         self._task: asyncio.Task | None = None
@@ -76,11 +76,13 @@ class SkzpTcpClient:
 
     async def stop(self):
         if self._writer:
-            self._writer.close()
             try:
+                self._writer.close()
                 await self._writer.wait_closed()
             except Exception:
                 pass
+            self._writer = None
+            self._reader = None
         if self._task:
             self._task.cancel()
             try:
@@ -91,6 +93,14 @@ class SkzpTcpClient:
     async def _reconnect(self):
         _LOGGER.warning("[SKZP] Utracono połączenie — próba ponownego połączenia za 5s...")
         self._connected = False
+        if self._writer:
+            try:
+                self._writer.close()
+                await self._writer.wait_closed()
+            except Exception:
+                pass
+            self._writer = None
+            self._reader = None
         await asyncio.sleep(5)
         await self._connect()
 
@@ -116,10 +126,9 @@ class SkzpTcpClient:
                     await self._reconnect()
                     continue
 
-                # zdarzają się śmieci/fragmenty — sklejaj do pełnej linii
+                # zdarzają się fragmenty — sklejaj do pełnej linii JSON
                 buffer += line
                 if not buffer.rstrip().endswith(b"}"):
-                    # czekamy aż dojdzie końcówka JSON-a
                     continue
 
                 line_str = buffer.decode(errors="ignore").strip()
@@ -156,13 +165,11 @@ class SkzpTcpClient:
         # Pobieramy dynamicznie Token i DevId z ostatnich odebranych danych
         dev_id = self.data.get("DevId", "APLSI")
         token = self.data.get("Token", "MOZHW")
-        # Twój PIN (zostawiamy sztywno, bo JSON podawał zakodowany "HHWV")
-        dev_pin = "9805" 
 
         # Budowa ramki autoryzacyjnej
         payload = {
             "DevId": dev_id,
-            "DevPin": dev_pin,
+            "DevPin": self.pin,
             "Token": token
         }
         # Dodajemy nasze parametry do zmiany

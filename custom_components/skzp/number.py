@@ -15,13 +15,13 @@ NUMBERS = {
     "CH1RoomTempEco": {"name": "Temp. w domu (Eco)", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
 
     # 📊 NOWE SKZP-05 (Trzy obiegi grzewcze)
-    "C030": {"name": "O1 Zad. T. Powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
-    "C013": {"name": "O1 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "C014": {"name": "O1 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    "C113": {"name": "O2 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "C114": {"name": "O2 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    "C213": {"name": "O3 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "C214": {"name": "O3 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    #"C030": {"name": "O1 Zad. T. Powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
+    #"C013": {"name": "O1 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    #"C014": {"name": "O1 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    #"C113": {"name": "O2 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    #"C114": {"name": "O2 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    #"C213": {"name": "O3 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    #"C214": {"name": "O3 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -48,7 +48,7 @@ class SkzpNumber(RestoreNumber):
         self._attr_name = meta["name"]
         
         self.entity_id = f"number.skzp_{key.lower()}"
-        self._attr_unique_id = self.entity_id
+        self._attr_unique_id = f"skzp_{key.lower()}"
         
         self._attr_native_min_value = meta["min"]
         self._attr_native_max_value = meta["max"]
@@ -62,7 +62,7 @@ class SkzpNumber(RestoreNumber):
         """Funkcja wywoływana przy dodawaniu encji do HA (np. po restarcie)."""
         await super().async_added_to_hass()
         
-        # 1. PANCERNE ZABEZPIECZENIE: Przywracanie ostatniego stanu z bazy danych HA!
+        # 1. Przywracanie ostatniego stanu z bazy danych HA
         last_number_data = await self.async_get_last_number_data()
         if last_number_data and last_number_data.native_value is not None:
             self._attr_native_value = last_number_data.native_value
@@ -86,7 +86,7 @@ class SkzpNumber(RestoreNumber):
                 
                 # Jeśli nowa wartość z pieca różni się od naszej, zaktualizuj suwak
                 if self._attr_native_value != val:
-                    self._attr_native_value = val
+                    self._attr_native_value = round(val, 2)
                     self.async_write_ha_state()
             except ValueError:
                 pass
@@ -94,9 +94,9 @@ class SkzpNumber(RestoreNumber):
     async def async_set_native_value(self, value: float) -> None:
         """Funkcja wywoływana, gdy przesuniesz suwak w Home Assistant."""
         if self._meta.get("divider"):
-            send_val = int(value * self._meta["divider"])
+            send_val = int(round(value * self._meta["divider"]))
         else:
-            send_val = int(value)
+            send_val = int(round(value))
             
         # Zapisz natychmiastowo w interfejsie HA
         self._attr_native_value = value
@@ -114,6 +114,8 @@ class SkzpNumber(RestoreNumber):
     def device_info(self):
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP",  # ZMIENIONO NA UNIWERSALNE "SKZP"
+            "name": "SKZP",
             "manufacturer": "Timel",
+            "model": "SKZP TCP Integration",
         }
+
