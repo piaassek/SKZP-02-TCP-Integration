@@ -24,12 +24,13 @@ def _decode_devstatus_mode(raw_value) -> str:
     raw_str = str(raw_value) if raw_value is not None else ""
     if not raw_str or len(raw_str) < 3:
         return STATE_UNKNOWN
-    mode = raw_str[0:3]
+    mode = raw_str[0:3].upper()
     mode_map = {
         "PRA": "Praca",
         "CZU": "Czuwanie",
         "MOD": "Modulacja",
         "STO": "Stop",
+        "OFF": "Wyłączony",
         "ROZ": "Rozpalanie",
         "WYG": "Wygaszanie",
         "DOP": "Dopalanie",
@@ -74,12 +75,22 @@ def _decode_alarms(raw_value) -> str:
             "F": "Błąd czujnika spalin",
             "G": "Błąd czujnika mieszacza",
             "H": "Błąd czujnika CWU",
+            "I": "Błąd czujnika Obiegu 1",
+            "J": "Błąd czujnika Obiegu 2",
+            "K": "Błąd czujnika Obiegu 3",
+            "M": "Błąd czujnika bufora",
             "P": "Błąd czujnika pokojowego",
-            "R": "Blokada tłoka",
+            "Q": "Błąd modułu / komunikacji",
+            "R": "Blokada tłoka / podajnika",
             "S": "Blokada tłoka (S)",
             "T": "Błąd rozpalania",
             "U": "Rezerwa opału",
+            "V": "Błąd czujnika pogodowego",
             "W": "Błąd konf. modułu",
+            "Y": "Błąd czujnika pomocniczego Y",
+            "Z": "Błąd czujnika pomocniczego Z",
+            "1": "Ostrzeżenie 1",
+            "2": "Ostrzeżenie 2",
         }
 
         if not raw_str or raw_str.strip("0") == "":
@@ -95,4 +106,5 @@ def _decode_alarms(raw_value) -> str:
     except Exception as e:
         _LOGGER.warning(f"[SKZP] Błąd dekodowania Alarms: {e}")
         return str(raw_value) if raw_value is not None else STATE_UNKNOWN
+
 

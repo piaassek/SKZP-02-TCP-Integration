@@ -162,16 +162,18 @@ class SkzpTcpClient:
             _LOGGER.error("[SKZP] Brak połączenia, nie można wysłać komendy.")
             return
 
-        # Pobieramy dynamicznie Token i DevId z ostatnich odebranych danych
+        # Pobieramy dynamicznie Token, DevId i DevPin z ostatnich odebranych danych
         dev_id = self.data.get("DevId", "APLSI")
         token = self.data.get("Token", "MOZHW")
+        dev_pin = self.data.get("DevPin", self.pin) if self.pin == DEFAULT_PIN else self.pin
 
         # Budowa ramki autoryzacyjnej
         payload = {
             "DevId": dev_id,
-            "DevPin": self.pin,
+            "DevPin": dev_pin,
             "Token": token
         }
+
         # Dodajemy nasze parametry do zmiany
         payload.update(parameters)
 

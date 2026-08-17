@@ -72,17 +72,28 @@ class SkzpSensor(SensorEntity):
         if self._key.startswith("DevStatus_") and raw_value is None:
             raw_value = self._client.data.get("DevStatus", "")
         
+        # Jeśli parametr nie przyszedł w ramce (np. specyficzny dla innego modelu)
+        if raw_value is None:
+            self._attr_available = False
+            self._attr_native_value = None
+            self.async_write_ha_state()
+            return
+
+        # Wartość 30000 lub 9999 w sterownikach Timel oznacza odłączony / nieaktywny czujnik
+        if str(raw_value).strip() in ("30000", "9999"):
+            self._attr_available = False
+            self._attr_native_value = None
+            self.async_write_ha_state()
+            return
+
+        self._attr_available = True
+
         # Dekodowanie wartości tekstowych (np. Alarms, DevStatus_Mode)
         decoded = decode_value(self._key, raw_value)
 
         # Jeśli dekoder zwrócił przetłumaczoną wartość inną niż wejściowa
         if decoded != str(raw_value):
             self._attr_native_value = decoded
-            self.async_write_ha_state()
-            return
-
-        if raw_value is None:
-            self._attr_native_value = None
             self.async_write_ha_state()
             return
 
@@ -104,9 +115,12 @@ class SkzpSensor(SensorEntity):
 
     @property
     def device_info(self):
+        dev_type = self._client.data.get("DevType", "SKZP")
+        model = "SKZP-05" if "05" in str(dev_type) else ("SKZP-02" if "02" in str(dev_type) else "SKZP")
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP",
+            "name": f"Sterownik {model}",
             "manufacturer": "Timel",
-            "model": "SKZP TCP Integration",
-        }
+            "model": str(dev_type),
+        }
+

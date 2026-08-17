@@ -71,9 +71,12 @@ class SkzpDHWModeSelect(SelectEntity):
 
     @property
     def device_info(self):
+        dev_type = self._client.data.get("DevType", "SKZP")
+        model = "SKZP-05" if "05" in str(dev_type) else ("SKZP-02" if "02" in str(dev_type) else "SKZP")
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP",
+            "name": f"Sterownik {model}",
             "manufacturer": "Timel",
-            "model": "SKZP TCP Integration",
-        }
+            "model": str(dev_type),
+        }
+

@@ -7,21 +7,31 @@ _LOGGER = logging.getLogger(__name__)
 
 # --- UNIWERSALNA MAPA SUWAKÓW (SKZP-02 + SKZP-05) ---
 NUMBERS = {
-    # ⚙️ WSPÓLNE / SKZP-02
+    # ⚙️ WSPÓLNE (SKZP-02 i SKZP-05)
+    "BoilerTempCmd": {"name": "Zadana temp. kotła", "min": 40, "max": 80, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+    "DHWTempCmd": {"name": "Zadana temp. CWU", "min": 30, "max": 65, "step": 1, "icon": "mdi:water-boiler", "divider": 100},
     "BuModulMin": {"name": "Min. modulacja", "min": 1, "max": 100, "step": 1, "icon": "mdi:gauge"},
-    "BoilerTempCmd": {"name": "Zad. T. Kotła", "min": 40, "max": 80, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
-    "DHWTempCmd": {"name": "Zad. T. CWU", "min": 30, "max": 65, "step": 1, "icon": "mdi:water-boiler", "divider": 100},
-    "CH1RoomTempCom": {"name": "Temp.Komfort (Stary)", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "CH1RoomTempEco": {"name": "Temp. w domu (Eco)", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "BuModulMax": {"name": "Max. modulacja", "min": 1, "max": 100, "step": 1, "icon": "mdi:gauge-full"},
 
-    # 📊 NOWE SKZP-05 (Trzy obiegi grzewcze)
-    #"C030": {"name": "O1 Zad. T. Powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
-    #"C013": {"name": "O1 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    #"C014": {"name": "O1 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    #"C113": {"name": "O2 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    #"C114": {"name": "O2 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    #"C213": {"name": "O3 Temp. Komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    #"C214": {"name": "O3 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    # 🌡️ SKZP-02 (Starszy model)
+    "CH1RoomTempCom": {"name": "Temp. komfortowa pokojowa (SKZP-02)", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "CH1RoomTempEco": {"name": "Temp. ECO pokojowa (SKZP-02)", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "CH1ReturnTempCmd": {"name": "Zadana temp. powrotu (SKZP-02)", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
+    "CH1MixTempCmd": {"name": "Zadana temp. mieszacza (SKZP-02)", "min": 20, "max": 70, "step": 1, "icon": "mdi:valve", "divider": 100},
+
+    # 📊 SKZP-05 (Nowszy model - 3 Obiegi grzewcze)
+    "C030": {"name": "O1 Zadana temp. powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
+    "C013": {"name": "O1 Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "C014": {"name": "O1 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "C027": {"name": "O1 Max temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+
+    "C113": {"name": "O2 Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "C114": {"name": "O2 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "C127": {"name": "O2 Max temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+
+    "C213": {"name": "O3 Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "C214": {"name": "O3 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "C227": {"name": "O3 Max temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -112,10 +122,13 @@ class SkzpNumber(RestoreNumber):
 
     @property
     def device_info(self):
+        dev_type = self._client.data.get("DevType", "SKZP")
+        model = "SKZP-05" if "05" in str(dev_type) else ("SKZP-02" if "02" in str(dev_type) else "SKZP")
         return {
             "identifiers": {(DOMAIN, "skzp_device")},
-            "name": "SKZP",
+            "name": f"Sterownik {model}",
             "manufacturer": "Timel",
-            "model": "SKZP TCP Integration",
+            "model": str(dev_type),
         }
+
 
