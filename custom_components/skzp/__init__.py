@@ -44,6 +44,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN]["client"] = skzp_client
     await skzp_client.start()
 
+    # Czekamy krótko na pierwszą ramkę danych (np. do 5s), aby wykryć model sterownika (SKZP-02 vs SKZP-05)
+    await skzp_client.wait_for_data(timeout=5.0)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
@@ -70,9 +73,28 @@ class SkzpTcpClient:
         self._task: asyncio.Task | None = None
         self.data: dict = {}
         self._connected = False
+        self._first_data_event = asyncio.Event()
+
+    @property
+    def is_skzp05(self) -> bool:
+        dev_type = str(self.data.get("DevType", ""))
+        return "05" in dev_type or "C030" in self.data or "C006" in self.data
+
+    @property
+    def is_skzp02(self) -> bool:
+        dev_type = str(self.data.get("DevType", ""))
+        return "02" in dev_type or "CH1MixTempAct" in self.data or not self.is_skzp05
+
+    async def wait_for_data(self, timeout: float = 5.0):
+        """Oczekuje na pierwszą poprawną ramkę danych."""
+        try:
+            await asyncio.wait_for(self._first_data_event.wait(), timeout=timeout)
+        except asyncio.TimeoutError:
+            pass
 
     async def start(self):
         self._task = asyncio.create_task(self._read_loop())
+
 
     async def stop(self):
         if self._writer:
@@ -139,11 +161,13 @@ class SkzpTcpClient:
                         parsed = json.loads(line_str)
                         # aktualizujemy słownik danych
                         self.data.update(parsed)
+                        self._first_data_event.set()
 
                         # publikujemy event dla sensorów/binary_sensorów
                         self.hass.bus.async_fire(f"{DOMAIN}_data_update")
                     except Exception as e:
                         _LOGGER.warning(f"[SKZP] Błąd parsowania JSON: {e}; ramka='{line_str[:200]}'")
+
                 else:
                     _LOGGER.debug(f"[SKZP] Pominięto niepełną/niepoprawną ramkę: {line_str[:200]}")
 

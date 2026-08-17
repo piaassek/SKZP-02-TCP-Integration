@@ -13,12 +13,27 @@ DIAGNOSTIC_KEYS = {"DevType", "TimeStamp", "DevStatus", "Alarms", "UpTime"}
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Inicjalizacja sensorów SKZP."""
+    """Inicjalizacja sensorów SKZP zależnie od wykrytego modelu."""
     client = hass.data[DOMAIN]["client"]
     entities = []
 
+    is_05 = client.is_skzp05
+    is_02 = not is_05
+
     for key, meta in SENSOR_MAP.items():
         if "name" not in meta:
+            continue
+
+        # Dla SKZP-02 pomijamy sensory specyficzne dla SKZP-05 (C0xx, C1xx, C2xx, D2xx)
+        if is_02 and (key.startswith(("C0", "C1", "C2", "D2"))):
+            continue
+
+        # Dla SKZP-05 pomijamy sensory specyficzne dla SKZP-02 (CH1Mix, CH1Room)
+        if is_05 and (key.startswith(("CH1Mix", "CH1Room"))):
+            continue
+
+        # Jeśli mamy dane ze sterownika, dodaj tylko te sensory, które faktycznie występują w ramce (lub wirtualne DevStatus_)
+        if client.data and (key not in client.data and not key.startswith("DevStatus_")):
             continue
 
         meta.setdefault("divider", None)
@@ -30,7 +45,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         entities.append(SkzpSensor(client, key, meta))
 
     async_add_entities(entities)
-    _LOGGER.info(f"[SKZP] Dodano {len(entities)} sensorów.")
+    _LOGGER.info(f"[SKZP] Dodano {len(entities)} sensorów dla modelu {'SKZP-05' if is_05 else 'SKZP-02'}.")
+
 
 
 class SkzpSensor(SensorEntity):

@@ -5,45 +5,64 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-# --- UNIWERSALNA MAPA SUWAKÓW (SKZP-02 + SKZP-05) ---
-NUMBERS = {
-    # ⚙️ WSPÓLNE (SKZP-02 i SKZP-05)
+# --- DEFINICJE SUWAKÓW ---
+COMMON_NUMBERS = {
     "BoilerTempCmd": {"name": "Zadana temp. kotła", "min": 40, "max": 80, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
     "DHWTempCmd": {"name": "Zadana temp. CWU", "min": 30, "max": 65, "step": 1, "icon": "mdi:water-boiler", "divider": 100},
     "BuModulMin": {"name": "Min. modulacja", "min": 1, "max": 100, "step": 1, "icon": "mdi:gauge"},
-    "BuModulMax": {"name": "Max. modulacja", "min": 1, "max": 100, "step": 1, "icon": "mdi:gauge-full"},
+    "BuModulMax": {"name": "Maks. modulacja", "min": 1, "max": 100, "step": 1, "icon": "mdi:gauge-full"},
+}
 
-    # 🌡️ SKZP-02 (Starszy model)
-    "CH1RoomTempCom": {"name": "Temp. komfortowa pokojowa (SKZP-02)", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "CH1RoomTempEco": {"name": "Temp. ECO pokojowa (SKZP-02)", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    "CH1ReturnTempCmd": {"name": "Zadana temp. powrotu (SKZP-02)", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
-    "CH1MixTempCmd": {"name": "Zadana temp. mieszacza (SKZP-02)", "min": 20, "max": 70, "step": 1, "icon": "mdi:valve", "divider": 100},
+SKZP02_NUMBERS = {
+    "CH1RoomTempCom": {"name": "Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+    "CH1RoomTempEco": {"name": "Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+    "CH1ReturnTempCmd": {"name": "Zadana temp. powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
+    "CH1MixTempCmd": {"name": "Zadana temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:valve", "divider": 100},
+}
 
-    # 📊 SKZP-05 (Nowszy model - 3 Obiegi grzewcze)
-    "C030": {"name": "O1 Zadana temp. powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
-    "C013": {"name": "O1 Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "C014": {"name": "O1 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    "C027": {"name": "O1 Max temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
-
-    "C113": {"name": "O2 Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "C114": {"name": "O2 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    "C127": {"name": "O2 Max temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
-
-    "C213": {"name": "O3 Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
-    "C214": {"name": "O3 Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
-    "C227": {"name": "O3 Max temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+SKZP05_CIRCUITS = {
+    "C0": {
+        "C030": {"name": "Obieg 1: Zadana temp. powrotu", "min": 20, "max": 65, "step": 1, "icon": "mdi:radiator", "divider": 100},
+        "C013": {"name": "Obieg 1: Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+        "C014": {"name": "Obieg 1: Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+        "C027": {"name": "Obieg 1: Maks. temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+    },
+    "C1": {
+        "C113": {"name": "Obieg 2: Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+        "C114": {"name": "Obieg 2: Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+        "C127": {"name": "Obieg 2: Maks. temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+    },
+    "C2": {
+        "C213": {"name": "Obieg 3: Temp. komfortowa", "min": 15, "max": 30, "step": 0.5, "icon": "mdi:home-thermometer", "divider": 100},
+        "C214": {"name": "Obieg 3: Temp. ECO", "min": 10, "max": 25, "step": 0.5, "icon": "mdi:leaf", "divider": 100},
+        "C227": {"name": "Obieg 3: Maks. temp. mieszacza", "min": 20, "max": 70, "step": 1, "icon": "mdi:thermometer-chevron-up", "divider": 100},
+    },
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Inicjalizacja suwaków SKZP."""
+    """Inicjalizacja suwaków SKZP zależnie od wykrytego modelu."""
     client = hass.data[DOMAIN]["client"]
     entities = []
     
-    for key, meta in NUMBERS.items():
+    # Wspólne dla obu modeli
+    for key, meta in COMMON_NUMBERS.items():
         entities.append(SkzpNumber(client, key, meta))
         
+    # Dobór suwaków specyficznych dla modelu
+    if client.is_skzp05:
+        for prefix, circuit_numbers in SKZP05_CIRCUITS.items():
+            has_circuit = any(k in client.data for k in circuit_numbers.keys())
+            if has_circuit:
+                for key, meta in circuit_numbers.items():
+                    if key in client.data:
+                        entities.append(SkzpNumber(client, key, meta))
+    else:
+        for key, meta in SKZP02_NUMBERS.items():
+            entities.append(SkzpNumber(client, key, meta))
+        
     async_add_entities(entities)
-    _LOGGER.info(f"[SKZP] Dodano {len(entities)} encji sterujących (Number).")
+    _LOGGER.info(f"[SKZP] Dodano {len(entities)} encji sterujących (Number) dla modelu {'SKZP-05' if client.is_skzp05 else 'SKZP-02'}.")
+
 
 
 class SkzpNumber(RestoreNumber):

@@ -21,12 +21,19 @@ PUMP_KEYS = {
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     client = hass.data[DOMAIN]["client"]
-    entities = [
-        DevStatusBinarySensor(client, key, name, index)
-        for key, (name, index) in PUMP_KEYS.items()
-    ]
+    entities = []
+
+    is_05 = client.is_skzp05
+
+    for key, (name, index) in PUMP_KEYS.items():
+        # Pompy CO3 i Bufor (COB) występują tylko w SKZP-05
+        if not is_05 and key in ("DevStatus_CO3", "DevStatus_COB"):
+            continue
+        entities.append(DevStatusBinarySensor(client, key, name, index))
+
     async_add_entities(entities)
-    _LOGGER.info(f"[SKZP] Dodano {len(entities)} binary sensorów z DevStatus.")
+    _LOGGER.info(f"[SKZP] Dodano {len(entities)} binary sensorów z DevStatus dla modelu {'SKZP-05' if is_05 else 'SKZP-02'}.")
+
 
 
 class DevStatusBinarySensor(BinarySensorEntity):
