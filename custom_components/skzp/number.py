@@ -41,12 +41,13 @@ SKZP05_CIRCUITS = {
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Inicjalizacja suwaków SKZP zależnie od wykrytego modelu."""
-    client = hass.data[DOMAIN]["client"]
+    client = hass.data[DOMAIN][config_entry.entry_id]
+    entry_id = config_entry.entry_id
     entities = []
     
     # Wspólne dla obu modeli
     for key, meta in COMMON_NUMBERS.items():
-        entities.append(SkzpNumber(client, key, meta))
+        entities.append(SkzpNumber(client, entry_id, key, meta))
         
     # Dobór suwaków specyficznych dla modelu
     if client.is_skzp05:
@@ -55,10 +56,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             if has_circuit:
                 for key, meta in circuit_numbers.items():
                     if key in client.data:
-                        entities.append(SkzpNumber(client, key, meta))
+                        entities.append(SkzpNumber(client, entry_id, key, meta))
     else:
         for key, meta in SKZP02_NUMBERS.items():
-            entities.append(SkzpNumber(client, key, meta))
+            entities.append(SkzpNumber(client, entry_id, key, meta))
         
     async_add_entities(entities)
     _LOGGER.info(f"[SKZP] Dodano {len(entities)} encji sterujących (Number) dla modelu {'SKZP-05' if client.is_skzp05 else 'SKZP-02'}.")
@@ -70,19 +71,18 @@ class SkzpNumber(RestoreNumber):
 
     _attr_should_poll = False
 
-    def __init__(self, client, key, meta):
+    def __init__(self, client, entry_id, key, meta):
         self._client = client
         self._key = key
         self._meta = meta
         self._attr_name = meta["name"]
-        
-        self.entity_id = f"number.skzp_{key.lower()}"
-        self._attr_unique_id = f"skzp_{key.lower()}"
+        self._attr_unique_id = f"{entry_id}_{key.lower()}"
         
         self._attr_native_min_value = meta["min"]
         self._attr_native_max_value = meta["max"]
         self._attr_native_step = meta["step"]
         self._attr_icon = meta["icon"]
+
         
         self._attr_native_value = None 
         self._remove_listener = None

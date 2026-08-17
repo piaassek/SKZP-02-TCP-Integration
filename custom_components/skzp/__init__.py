@@ -41,7 +41,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     pin = entry.data.get(CONF_PIN, DEFAULT_PIN)
 
     skzp_client = SkzpTcpClient(hass, host, port, pin)
-    hass.data[DOMAIN]["client"] = skzp_client
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = skzp_client
     await skzp_client.start()
 
     # Czekamy krótko na pierwszą ramkę danych (np. do 5s), aby wykryć model sterownika (SKZP-02 vs SKZP-05)
@@ -53,11 +54,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Wyładowanie integracji."""
-    client: "SkzpTcpClient" = hass.data[DOMAIN].get("client")
+    client: "SkzpTcpClient" = hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
     if client:
         await client.stop()
         
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
 
 
 class SkzpTcpClient:

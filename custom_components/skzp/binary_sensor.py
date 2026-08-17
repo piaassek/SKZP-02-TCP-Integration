@@ -20,7 +20,8 @@ PUMP_KEYS = {
 }
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    client = hass.data[DOMAIN]["client"]
+    client = hass.data[DOMAIN][config_entry.entry_id]
+    entry_id = config_entry.entry_id
     entities = []
 
     is_05 = client.is_skzp05
@@ -29,11 +30,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         # Pompy CO3 i Bufor (COB) występują tylko w SKZP-05
         if not is_05 and key in ("DevStatus_CO3", "DevStatus_COB"):
             continue
-        entities.append(DevStatusBinarySensor(client, key, name, index))
+        entities.append(DevStatusBinarySensor(client, entry_id, key, name, index))
 
     async_add_entities(entities)
     _LOGGER.info(f"[SKZP] Dodano {len(entities)} binary sensorów z DevStatus dla modelu {'SKZP-05' if is_05 else 'SKZP-02'}.")
-
 
 
 class DevStatusBinarySensor(BinarySensorEntity):
@@ -41,19 +41,18 @@ class DevStatusBinarySensor(BinarySensorEntity):
 
     _attr_should_poll = False
 
-    def __init__(self, client, key, name, index):
+    def __init__(self, client, entry_id, key, name, index):
         self._client = client
         self._key = key
         self._index = index
         self._attr_name = name
-        
-        self.entity_id = f"binary_sensor.skzp_{key.lower()}"
-        self._attr_unique_id = f"skzp_{key.lower()}"
+        self._attr_unique_id = f"{entry_id}_{key.lower()}"
         
         # Dynamiczne dobieranie ikon
         self._attr_icon = "mdi:pump" if "CO" in key or "CW" in key else "mdi:screw-forward"
         self._attr_is_on = False
         self._remove_listener = None
+
 
     async def async_added_to_hass(self):
         """Podpięcie nasłuchiwania danych po dodaniu encji do HA."""

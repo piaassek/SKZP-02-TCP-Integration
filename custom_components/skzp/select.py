@@ -17,8 +17,9 @@ DHW_MODES_INV = {v: k for k, v in DHW_MODES.items()}
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Inicjalizacja listy wyboru dla SKZP."""
-    client = hass.data[DOMAIN]["client"]
-    async_add_entities([SkzpDHWModeSelect(client)])
+    client = hass.data[DOMAIN][config_entry.entry_id]
+    entry_id = config_entry.entry_id
+    async_add_entities([SkzpDHWModeSelect(client, entry_id)])
     _LOGGER.info("[SKZP] Dodano encję select (Tryb CWU).")
 
 class SkzpDHWModeSelect(SelectEntity):
@@ -28,13 +29,13 @@ class SkzpDHWModeSelect(SelectEntity):
     _attr_name = "Tryb pompy CWU"
     _attr_icon = "mdi:water-pump"
 
-    def __init__(self, client):
+    def __init__(self, client, entry_id):
         self._client = client
-        self.entity_id = "select.skzp_dhwmode"
-        self._attr_unique_id = "skzp_dhwmode"
+        self._attr_unique_id = f"{entry_id}_dhwmode"
         self._attr_options = list(DHW_MODES.keys())
         self._attr_current_option = None
         self._remove_listener = None
+
 
     async def async_added_to_hass(self):
         """Nasłuchiwanie po restarcie."""
