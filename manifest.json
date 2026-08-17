@@ -1,7 +1,7 @@
 {
   "domain": "skzp",
   "name": "SKZP TCP Integration",
-  "version": "1.0.1", 
+  "version": "1.0.2", 
   "documentation": "https://github.com/...",
   "dependencies": [],
   "codeowners": [],
