@@ -131,47 +131,53 @@ class SkzpTcpClient:
     async def _connect(self):
         while True:
             try:
-                self._reader, self._writer = await asyncio.open_connection(self.host, self.port)
+                _LOGGER.info(f"[SKZP] Łączenie z bramką {self.host}:{self.port}...")
+                self._reader, self._writer = await asyncio.wait_for(
+                    asyncio.open_connection(self.host, self.port), timeout=10.0
+                )
                 self._connected = True
-                _LOGGER.info(f"[SKZP] Połączono z {self.host}:{self.port}")
+                _LOGGER.info(f"[SKZP] Połączono pomyślnie z {self.host}:{self.port}")
                 return
+            except asyncio.CancelledError:
+                raise
             except Exception as e:
-                _LOGGER.error(f"[SKZP] Błąd połączenia: {e} — ponawiam za 10s")
-                await asyncio.sleep(10)
+                _LOGGER.warning(f"[SKZP] Błąd połączenia z {self.host}:{self.port}: {e} — ponawiam za 5s")
+                await asyncio.sleep(5)
 
     async def _read_loop(self):
         await self._connect()
-        buffer = b""
+        buffer = ""
         while True:
             try:
-                # timeout chroni przed wiszeniem gdy urządzenie milczy
-                line = await asyncio.wait_for(self._reader.readline(), timeout=60)
-                if not line:
+                chunk = await asyncio.wait_for(self._reader.read(4096), timeout=60)
+                if not chunk:
+                    _LOGGER.warning("[SKZP] Połączenie zamknięte przez bramkę — wznawianie...")
                     await self._reconnect()
                     continue
 
-                # zdarzają się fragmenty — sklejaj do pełnej linii JSON
-                buffer += line
-                if not buffer.rstrip().endswith(b"}"):
-                    continue
+                buffer += chunk.decode("utf-8", errors="ignore")
 
-                line_str = buffer.decode(errors="ignore").strip()
-                buffer = b""  # czyścimy bufor po pełnej ramce
+                # Wyodrębnianie kompletnych obiektów JSON {...} ze strumienia
+                while "{" in buffer and "}" in buffer:
+                    start = buffer.find("{")
+                    end = buffer.find("}", start)
+                    if end == -1:
+                        # Obcięty JSON — czekamy na kolejną paczkę danych
+                        buffer = buffer[start:]
+                        break
 
-                if line_str.startswith("{") and line_str.endswith("}"):
+                    json_str = buffer[start : end + 1]
+                    buffer = buffer[end + 1 :]
+
                     try:
-                        parsed = json.loads(line_str)
-                        # aktualizujemy słownik danych
-                        self.data.update(parsed)
-                        self._first_data_event.set()
-
-                        # publikujemy event dla sensorów/binary_sensorów
-                        self.hass.bus.async_fire(f"{DOMAIN}_data_update")
+                        parsed = json.loads(json_str)
+                        if isinstance(parsed, dict):
+                            self.data.update(parsed)
+                            self._first_data_event.set()
+                            _LOGGER.debug(f"[SKZP] Odebrano dane ({len(parsed)} pól)")
+                            self.hass.bus.async_fire(f"{DOMAIN}_data_update")
                     except Exception as e:
-                        _LOGGER.warning(f"[SKZP] Błąd parsowania JSON: {e}; ramka='{line_str[:200]}'")
-
-                else:
-                    _LOGGER.debug(f"[SKZP] Pominięto niepełną/niepoprawną ramkę: {line_str[:200]}")
+                        _LOGGER.debug(f"[SKZP] Błąd parsowania wycinka JSON: {e}")
 
             except asyncio.TimeoutError:
                 _LOGGER.warning("[SKZP] Brak danych przez 60s — odświeżam połączenie")
@@ -181,6 +187,7 @@ class SkzpTcpClient:
             except Exception as e:
                 _LOGGER.error(f"[SKZP] Błąd w pętli odbioru: {e}")
                 await self._reconnect()
+
 
     async def send_command(self, parameters: dict):
         """Wysyła komendę do pieca."""

@@ -1,7 +1,10 @@
+import asyncio
 import logging
+import time
 from homeassistant.components.number import RestoreNumber
 from homeassistant.core import callback
 from .const import DOMAIN
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,6 +89,8 @@ class SkzpNumber(RestoreNumber):
         
         self._attr_native_value = None 
         self._remove_listener = None
+        self._pending_target = None
+        self._pending_until = None
 
     async def async_added_to_hass(self):
         """Funkcja wywoływana przy dodawaniu encji do HA (np. po restarcie)."""
@@ -113,6 +118,21 @@ class SkzpNumber(RestoreNumber):
                 if self._meta.get("divider"):
                     val = val / self._meta["divider"]
                 
+                # Zabezpieczenie przed "odbiciem" suwaka przez starą ramkę będącą jeszcze w locie
+                if self._pending_until is not None:
+                    now = time.time()
+                    if now < self._pending_until:
+                        # Jeśli piec już potwierdził zadaną wartość, zdejmujemy blokadę
+                        if round(val, 2) == round(self._pending_target, 2):
+                            self._pending_until = None
+                            self._pending_target = None
+                        else:
+                            # Ignorujemy starą ramkę, aby suwak nie wracał na starą pozycję
+                            return
+                    else:
+                        self._pending_until = None
+                        self._pending_target = None
+
                 # Jeśli nowa wartość z pieca różni się od naszej, zaktualizuj suwak
                 if self._attr_native_value != val:
                     self._attr_native_value = round(val, 2)
@@ -129,10 +149,15 @@ class SkzpNumber(RestoreNumber):
             
         # Zapisz natychmiastowo w interfejsie HA
         self._attr_native_value = value
+        self._pending_target = value
+        self._pending_until = time.time() + 3.0  # blokada starych ramek na max 3s
         self.async_write_ha_state()
         
         # Wyślij fizycznie przez TCP do pieca
         await self._client.send_command({self._key: str(send_val)})
+
+
+
 
     async def async_will_remove_from_hass(self):
         """Sprzątanie przed usunięciem encji z systemu."""

@@ -1,4 +1,6 @@
+import asyncio
 import logging
+import time
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import callback
 from .const import DOMAIN
@@ -35,7 +37,8 @@ class SkzpDHWModeSelect(SelectEntity):
         self._attr_options = list(DHW_MODES.keys())
         self._attr_current_option = None
         self._remove_listener = None
-
+        self._pending_target = None
+        self._pending_until = None
 
     async def async_added_to_hass(self):
         """Nasłuchiwanie po restarcie."""
@@ -50,6 +53,20 @@ class SkzpDHWModeSelect(SelectEntity):
         raw_val = self._client.data.get("DHWMode")
         if raw_val in DHW_MODES_INV:
             new_val = DHW_MODES_INV[raw_val]
+
+            # Zabezpieczenie przed cofaniem wyboru przez starą ramkę
+            if self._pending_until is not None:
+                now = time.time()
+                if now < self._pending_until:
+                    if new_val == self._pending_target:
+                        self._pending_until = None
+                        self._pending_target = None
+                    else:
+                        return
+                else:
+                    self._pending_until = None
+                    self._pending_target = None
+
             if self._attr_current_option != new_val:
                 self._attr_current_option = new_val
                 self.async_write_ha_state()
@@ -59,12 +76,17 @@ class SkzpDHWModeSelect(SelectEntity):
         if option in DHW_MODES:
             val_to_send = DHW_MODES[option]
             
-            # Zmiana wizualna w UI
+            # Zmiana wizualna w UI i blokada starych ramek
             self._attr_current_option = option
+            self._pending_target = option
+            self._pending_until = time.time() + 3.0
             self.async_write_ha_state()
             
             # Wysłanie komendy JSON przez TCP
             await self._client.send_command({"DHWMode": val_to_send})
+
+
+
 
     async def async_will_remove_from_hass(self):
         if self._remove_listener:

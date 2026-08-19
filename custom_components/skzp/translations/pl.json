@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfiguracja sterownika SKZP",
+        "description": "Wprowadź parametry połączenia z modułem LAN/Wi-Fi sterownika SKZP.",
+        "data": {
+          "host": "Adres IP",
+          "port": "Port TCP",
+          "pin": "PIN (domyślnie 9805)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć ze wskazanym adresem IP i portem. Sprawdź czy bramka jest włączona i w tej samej sieci."
+    },
+    "abort": {
+      "already_configured": "To urządzenie jest już skonfigurowane."
+    }
+  }
+}
