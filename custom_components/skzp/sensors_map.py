@@ -32,8 +32,9 @@ SENSOR_MAP = {
     "BuTotalFuel": {"name": "Całkowite zużycie paliwa", "unit": "kg", "divider": 100, "icon": "mdi:factory", "state_class": "total_increasing"},
     "Bu24hFuel": {"name": "Zużycie paliwa 24h", "unit": "kg", "divider": 100, "icon": "mdi:fire-circle", "state_class": "measurement"},
     "BuActualFuel": {"name": "Aktualne spalanie", "unit": "kg/h", "divider": 100, "icon": "mdi:fire-alert", "state_class": "measurement"},
-    "BuFuelCaloric": {"name": "Kaloryczność paliwa", "unit": "MJ/kg", "divider": 1, "icon": "mdi:fire"},
+    "BuFuelCaloric": {"name": "Kaloryczność paliwa", "unit": "kWh/kg", "divider": 10, "icon": "mdi:fire"},
     "BuFuelCorr": {"name": "Korekta paliwa", "unit": "%", "divider": 1, "icon": "mdi:fire"},
+
     "B060": {"name": "Pojemność zasobnika", "unit": "kg", "divider": 1, "icon": "mdi:tools"},
     "B062": {"name": "Pozostałe paliwo", "unit": "kg", "divider": 10, "icon": "mdi:tools"},
     "B059": {"name": "Rezerwa paliwa", "unit": "kg", "divider": 1, "icon": "mdi:tools"},
